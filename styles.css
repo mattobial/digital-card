@@ -90,6 +90,28 @@ details.analytics-panel { margin-top: 10px; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .small { font-size: .9rem; white-space: pre-wrap; }
 
+/* QR modal */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.65);
+  display: grid; place-items: center;
+  visibility: hidden;
+}
+.modal[aria-hidden="false"] { visibility: visible; }
+.modal-content {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  width: min(92vw, 360px);
+}
+.qrbox {
+  display: grid; place-items: center;
+  padding: 10px; background: #0b0c10; border-radius: 12px;
+  border: 1px solid #1d2027; margin: 6px auto 0; min-height: 256px;
+}
+
 @media (min-width: 640px) {
   form .grid { grid-template-columns: 1fr 1fr; }
   textarea { grid-column: span 2; }
