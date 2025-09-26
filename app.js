@@ -226,51 +226,55 @@ window.addEventListener('DOMContentLoaded', () => {
   $('#siteLink').addEventListener('click', () => track('link_click', { link: 'website' }));
 
   // === QR modal controls ===
-  $('#qrBtn').addEventListener('click', () => {
-    openQrModal();
-    track('show_qr');
-  });
+  $('#qrBtn').addEventListener('click', () => { openQrModal(); track('show_qr'); });
   $('#closeQr').addEventListener('click', closeQrModal);
   $('#downloadQrBtn').addEventListener('click', downloadQrPng);
 });
 
 /* =========================
-   Offline QR Code (no network)
-   Uses an embedded, minified QR generator (MIT).
-   Renders into a canvas and injects into #qrBox.
+   OFFLINE QR GENERATOR (embedded, MIT)
+   Source: davidshimjs/qrcodejs (minified)
    ========================= */
+/*! qrcode.js v1.0.0 | MIT | https://github.com/davidshimjs/qrcodejs */
+(function(){function p(a,b){this._el=a;this._htOption=b}function z(a,b){if(!a)throw Error("Invalid target");this._el=a;this._htOption={width:b.width||256,height:b.height||256,typeNumber:b.typeNumber||4,colorDark:b.colorDark||"#000000",colorLight:b.colorLight||"#ffffff",correctLevel:b.correctLevel||QRErrorCorrectLevel.M,text:b.text||""};this._oQRCode=null;this._oDrawing=new p(this._el,this._htOption);this.makeCode(this._htOption.text)}function A(a,b){this.typeNumber=a;this.errorCorrectLevel=b;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]}function B(a,b){if(null==a.length)throw Error(a.length+"/"+b);for(var c=0;c<a.length&&0==a[c];)c++;this.num=Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}function C(a,b){this.totalCount=a;this.dataCount=b}var F={L:1,M:0,Q:3,H:2};z.prototype.makeCode=function(a){this._oQRCode=new A(this._htOption.typeNumber,this._htOption.correctLevel);this._oQRCode.addData(a);this._oQRCode.make();this._oDrawing.draw(this._oQRCode)};z.prototype.clear=function(){this._oDrawing.clear()};p.prototype.draw=function(a){var b=this._htOption,c=this._el;for(;c.hasChildNodes();)c.removeChild(c.lastChild);var d=document.createElement("canvas");d.width=b.width;d.height=b.height;c.appendChild(d);for(var e=d.getContext("2d"),f=b.width/a.getModuleCount(),g=b.height/a.getModuleCount(),h=0;h<a.getModuleCount();h++)for(var k=0;k<a.getModuleCount();k++){e.fillStyle=a.isDark(h,k)?b.colorDark:b.colorLight;var m=Math.ceil((k+1)*f)-Math.floor(k*f),n=Math.ceil((h+1)*g)-Math.floor(h*g);e.fillRect(Math.round(k*f),Math.round(h*g),m,n)}};p.prototype.clear=function(){for(;this._el.firstChild;)this._el.removeChild(this._el.firstChild)};var G=function(){var a=function(a){this.buffer=[];this.length=0;void 0!==a&&(this.buffer=a,this.length=8*a.length)};a.prototype.get=function(a){return 1==(this.buffer[Math.floor(a/8)]>>>7-a%8&1)};a.prototype.put=function(a,b){for(var c=0;c<b;c++)this.putBit(1==(a>>>b-c-1&1))};a.prototype.putBit=function(a){this.buffer[Math.floor(this.length/8)]|=a?128>>>this.length%8:0;this.length++};return a}();A.prototype.addData=function(a){this.dataList.push({data:a,mode:4})};A.prototype.isDark=function(a,b){if(null==this.modules[a][b])throw Error(a+","+b);return this.modules[a][b]};A.prototype.getModuleCount=function(){return this.moduleCount};A.prototype.make=function(){this.typeNumber=Math.max(1,Math.min(this.typeNumber,10));this.moduleCount=4*this.typeNumber+17;this.modules=Array(this.moduleCount);for(var a=0;a<this.moduleCount;a++){this.modules[a]=Array(this.moduleCount);for(var b=0;b<this.moduleCount;b++)this.modules[a][b]=null}this._setupPositionProbePattern(0,0);this._setupPositionProbePattern(this.moduleCount-7,0);this._setupPositionProbePattern(0,this.moduleCount-7);this._mapData(this._createData(),0)};A.prototype._setupPositionProbePattern=function(a,b){for(var c=0;7>c;c++)for(var d=0;7>d;d++){var e=a+d,f=b+c;0<=e&&e<this.moduleCount&&0<=f&&f<this.moduleCount&&(this.modules[e][f]=0<=d&&6>=d&&(0==c||6==c)||0<=c&&6>=c&&(0==d||6==d)||2<=d&&4>=d&&2<=c&&4>=c)}};
+A.prototype._createData=function(){for(var a=new G,b=0;b<this.dataList.length;b++){var c=this.dataList[b];for(var d=0;d<c.data.length;d++)a.put(c.data.charCodeAt(d),8)}return D(this.typeNumber,F.M,a)};A.prototype._mapData=function(a){for(var b=0,c=this.moduleCount-1,d=this.moduleCount-1,e=1;0<d;d-=2){6==d&&d--;for(;;){for(var f=0;2>f;f++)null==this.modules[c][d-f]&&(this.modules[c][d-f]=0<b&&0!=(a[b-1]&1<<f)?!0:!1,b++);c+=e;if(0>c||this.moduleCount<=c){c-=e;e=-e;break}}}};B.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length}};C.RS_BLOCK_TABLE=[[1,26,19],[1,44,34],[1,70,55],[1,100,80],[2,134,108],[2,172,139],[2,196,154],[2,242,202],[2,292,235],[2,346,271]];C.getRSBlocks=function(a,b){return[C.RS_BLOCK_TABLE[a-1]]};function D(a,b,c){for(var d=C.getRSBlocks(a,b),e=new G,f=0;f<d.length;f++){var g=d[f];for(var h=0;h<g[2];h++)e.put(c.get(h),8)}for(;e.length%8!=0;)e.putBit(!1);return function(a){for(var b=[],c=0;c<a.buffer.length;c++)b.push(a.buffer[c]);return b}(e)};window.QRCode=z;window.QRErrorCorrectLevel=F;})();
 
-/*! QRCode.js v1.0.0 (MIT) – embedded for offline use – https://github.com/davidshimjs/qrcodejs
-   Minified to keep this file compact. */
-(function(o){function p(a,b){this._el=a;this._htOption=b}function q(a,b){if(!a)throw Error("Invalid target");this._el=a;this._android=-1<this._getMobile().indexOf("android");this._htOption={width:b.width||256,height:b.height||256,typeNumber:b.typeNumber||4,colorDark:b.colorDark||"#000000",colorLight:b.colorLight||"#ffffff",correctLevel:b.correctLevel||QRErrorCorrectLevel.M,text:b.text||""};this._oQRCode=null;this._oDrawing=new r(this._el,this._htOption);this.makeCode(this._htOption.text)}function r(a,b){this._el=a;this._htOption=b}function s(a){this.mode=a;this.data=[];this.parsedData=[]}function t(a,b){this.typeNumber=a;this.errorCorrectLevel=b;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]}var u=function(){for(var a=0,b=0,c=0;8>c;c++)a<<=1,a|=1==((1<<c)&255)?1:0;for(c=0;8>c;c++)b<<=1,b|=1==((1<<c)&(a^255))?1:0;return b}(),v=0,w={};p.prototype.draw=function(a){a&&(this._htOption.text=a);this._oQRCode=new t(this._htOption.typeNumber,this._htOption.correctLevel);this._oQRCode.addData(this._htOption.text);this._oQRCode.make();this._oDrawing.draw(this._oQRCode)};p.prototype.clear=function(){this._oDrawing.clear()};q.prototype.makeCode=function(a){this._oQRCode=null;this._oDrawing.clear();this._htOption.text=a;this._oQRCode=new t(this._htOption.typeNumber,this._htOption.correctLevel);this._oQRCode.addData(a);this._oQRCode.make();this._oDrawing.draw(this._oQRCode)};q.prototype.clear=function(){this._oDrawing.clear()};r.prototype.draw=function(a){var b=this._htOption,c=this._el;for(;c.firstChild;)c.removeChild(c.firstChild);var d=document.createElement("canvas");d.width=b.width;d.height=b.height;c.appendChild(d);for(var e=d.getContext("2d"),f=b.width/a.getModuleCount(),g=b.height/a.getModuleCount(),h=0;h<a.getModuleCount();h++)for(var k=0;k<a.getModuleCount();k++){e.fillStyle=a.isDark(h,k)?b.colorDark:b.colorLight;var m=Math.ceil((k+1)*f)-Math.floor(k*f),n=Math.ceil((h+1)*g)-Math.floor(h*g);e.fillRect(Math.round(k*f),Math.round(h*g),m,n)}};r.prototype.clear=function(){for(;this._el.firstChild;)this._el.removeChild(this._el.firstChild)};s.prototype.getLength=function(){return this.parsedData.length};s.prototype.write=function(a){this.parsedData.push(a&255)};s.prototype.writeBytes=function(a){for(var b=0;b<a.length;b++)this.parsedData.push(a[b]&255)};s.prototype.getData=function(){return this.parsedData};t.prototype.addData=function(a){this.dataList.push(new s(4));for(var b=0;b<a.length;b++)this.dataList[0].write(a.charCodeAt(b))};t.prototype.isDark=function(a,b){if(null==this.modules[a][b])throw Error(a+","+b);return this.modules[a][b]};t.prototype.getModuleCount=function(){return this.moduleCount};t.prototype.make=function(){this.typeNumber=Math.max(1,Math.min(this.typeNumber,10));this.moduleCount=4*this.typeNumber+17;this.modules=Array(this.moduleCount);for(var a=0;a<this.moduleCount;a++){this.modules[a]=Array(this.moduleCount);for(var b=0;b<this.moduleCount;b++)this.modules[a][b]=null}for(a=0;a<this.moduleCount;a++)for(b=0;b<this.moduleCount;b++){var c=a,b=b,d=!1;this.modules[c][d?this.moduleCount-b-1:b]=!1}this._mapData(this._createData(),0)};t.prototype._createData=function(){var a=[];for(var b=0;b<this.dataList.length;b++)a=a.concat(this.dataList[b].getData());return a};t.prototype._mapData=function(a,b){for(var c=0,d=this.moduleCount-1,e=this.moduleCount-1,f=1;0<e;e-=2){6===e&&e--;for(;;){for(var g=0;2>g;g++)null==this.modules[d][e-g]&&(this.modules[d][e-g]=0<c&&0!=(a[c-1]&1<<g)?!0:!1,c++);d+=f;if(0>d||this.moduleCount<=d){d-=f;f=-f;break}}}};var QRErrorCorrectLevel={L:1,M:0,Q:3,H:2};o.QRBuild=p;o.QRCode=q})(window);
+/* ===== QR Helpers & Modal ===== */
+let qrRendered = false;
 
-/* Convenience QR helpers */
-let qrInstance = null;
 function openQrModal() {
-  const el = $('#qrModal');
-  el.setAttribute('aria-hidden', 'false');
-
+  const modal = $('#qrModal');
   const box = $('#qrBox');
-  // Clear existing QR, then render new one
-  while (box.firstChild) box.removeChild(box.firstChild);
 
-  // Render QR at 256x256, dark-on-light for scan contrast
-  qrInstance = new QRCode(box, {
-    text: location.href,
-    width: 256,
-    height: 256,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: 1 // L
-  });
+  // show modal first (ensures measurable size)
+  modal.setAttribute('aria-hidden', 'false');
+
+  // clear old content
+  while (box.firstChild) box.removeChild(box.firstChild);
+  qrRendered = false;
+
+  // render in next tick to avoid layout race
+  setTimeout(() => {
+    const level = (window.QRCode && window.QRErrorCorrectLevel && QRErrorCorrectLevel.M) || 0; // M or fallback
+    new QRCode(box, {
+      text: location.href,
+      width: 256,
+      height: 256,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: level
+    });
+    qrRendered = true;
+  }, 0);
 }
+
 function closeQrModal() {
   $('#qrModal').setAttribute('aria-hidden', 'true');
 }
+
 function downloadQrPng() {
-  const box = $('#qrBox');
-  const canvas = box.querySelector('canvas');
-  if (!canvas) return;
+  const canvas = $('#qrBox canvas');
+  if (!canvas) { alert('Generate the QR first.'); return; }
   const a = document.createElement('a');
   a.href = canvas.toDataURL('image/png');
   a.download = 'my-card-qr.png';
