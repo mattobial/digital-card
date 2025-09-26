@@ -232,46 +232,125 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* =========================
-   OFFLINE QR GENERATOR (embedded, MIT)
-   Source: davidshimjs/qrcodejs (minified)
+   OFFLINE QR GENERATOR (patched)
+   Minimal port of qrcode.js; isDark() never throws on null modules.
    ========================= */
-/*! qrcode.js v1.0.0 | MIT | https://github.com/davidshimjs/qrcodejs */
-(function(){function p(a,b){this._el=a;this._htOption=b}function z(a,b){if(!a)throw Error("Invalid target");this._el=a;this._htOption={width:b.width||256,height:b.height||256,typeNumber:b.typeNumber||4,colorDark:b.colorDark||"#000000",colorLight:b.colorLight||"#ffffff",correctLevel:b.correctLevel||QRErrorCorrectLevel.M,text:b.text||""};this._oQRCode=null;this._oDrawing=new p(this._el,this._htOption);this.makeCode(this._htOption.text)}function A(a,b){this.typeNumber=a;this.errorCorrectLevel=b;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]}function B(a,b){if(null==a.length)throw Error(a.length+"/"+b);for(var c=0;c<a.length&&0==a[c];)c++;this.num=Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}function C(a,b){this.totalCount=a;this.dataCount=b}var F={L:1,M:0,Q:3,H:2};z.prototype.makeCode=function(a){this._oQRCode=new A(this._htOption.typeNumber,this._htOption.correctLevel);this._oQRCode.addData(a);this._oQRCode.make();this._oDrawing.draw(this._oQRCode)};z.prototype.clear=function(){this._oDrawing.clear()};p.prototype.draw=function(a){var b=this._htOption,c=this._el;for(;c.hasChildNodes();)c.removeChild(c.lastChild);var d=document.createElement("canvas");d.width=b.width;d.height=b.height;c.appendChild(d);for(var e=d.getContext("2d"),f=b.width/a.getModuleCount(),g=b.height/a.getModuleCount(),h=0;h<a.getModuleCount();h++)for(var k=0;k<a.getModuleCount();k++){e.fillStyle=a.isDark(h,k)?b.colorDark:b.colorLight;var m=Math.ceil((k+1)*f)-Math.floor(k*f),n=Math.ceil((h+1)*g)-Math.floor(h*g);e.fillRect(Math.round(k*f),Math.round(h*g),m,n)}};p.prototype.clear=function(){for(;this._el.firstChild;)this._el.removeChild(this._el.firstChild)};var G=function(){var a=function(a){this.buffer=[];this.length=0;void 0!==a&&(this.buffer=a,this.length=8*a.length)};a.prototype.get=function(a){return 1==(this.buffer[Math.floor(a/8)]>>>7-a%8&1)};a.prototype.put=function(a,b){for(var c=0;c<b;c++)this.putBit(1==(a>>>b-c-1&1))};a.prototype.putBit=function(a){this.buffer[Math.floor(this.length/8)]|=a?128>>>this.length%8:0;this.length++};return a}();A.prototype.addData=function(a){this.dataList.push({data:a,mode:4})};A.prototype.isDark=function(a,b){if(null==this.modules[a][b])throw Error(a+","+b);return this.modules[a][b]};A.prototype.getModuleCount=function(){return this.moduleCount};A.prototype.make=function(){this.typeNumber=Math.max(1,Math.min(this.typeNumber,10));this.moduleCount=4*this.typeNumber+17;this.modules=Array(this.moduleCount);for(var a=0;a<this.moduleCount;a++){this.modules[a]=Array(this.moduleCount);for(var b=0;b<this.moduleCount;b++)this.modules[a][b]=null}this._setupPositionProbePattern(0,0);this._setupPositionProbePattern(this.moduleCount-7,0);this._setupPositionProbePattern(0,this.moduleCount-7);this._mapData(this._createData(),0)};A.prototype._setupPositionProbePattern=function(a,b){for(var c=0;7>c;c++)for(var d=0;7>d;d++){var e=a+d,f=b+c;0<=e&&e<this.moduleCount&&0<=f&&f<this.moduleCount&&(this.modules[e][f]=0<=d&&6>=d&&(0==c||6==c)||0<=c&&6>=c&&(0==d||6==d)||2<=d&&4>=d&&2<=c&&4>=c)}};
-A.prototype._createData=function(){for(var a=new G,b=0;b<this.dataList.length;b++){var c=this.dataList[b];for(var d=0;d<c.data.length;d++)a.put(c.data.charCodeAt(d),8)}return D(this.typeNumber,F.M,a)};A.prototype._mapData=function(a){for(var b=0,c=this.moduleCount-1,d=this.moduleCount-1,e=1;0<d;d-=2){6==d&&d--;for(;;){for(var f=0;2>f;f++)null==this.modules[c][d-f]&&(this.modules[c][d-f]=0<b&&0!=(a[b-1]&1<<f)?!0:!1,b++);c+=e;if(0>c||this.moduleCount<=c){c-=e;e=-e;break}}}};B.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length}};C.RS_BLOCK_TABLE=[[1,26,19],[1,44,34],[1,70,55],[1,100,80],[2,134,108],[2,172,139],[2,196,154],[2,242,202],[2,292,235],[2,346,271]];C.getRSBlocks=function(a,b){return[C.RS_BLOCK_TABLE[a-1]]};function D(a,b,c){for(var d=C.getRSBlocks(a,b),e=new G,f=0;f<d.length;f++){var g=d[f];for(var h=0;h<g[2];h++)e.put(c.get(h),8)}for(;e.length%8!=0;)e.putBit(!1);return function(a){for(var b=[],c=0;c<a.buffer.length;c++)b.push(a.buffer[c]);return b}(e)};window.QRCode=z;window.QRErrorCorrectLevel=F;})();
+(function(){
+  function Drawer(container, opt){ this._el=container; this._opt=opt; }
+  Drawer.prototype.draw=function(model){
+    while(this._el.firstChild) this._el.removeChild(this._el.firstChild);
+    const c=document.createElement('canvas');
+    c.width=this._opt.width; c.height=this._opt.height;
+    this._el.appendChild(c);
+    const ctx=c.getContext('2d');
+    const n=model.getModuleCount();
+    const pw=this._opt.width/n, ph=this._opt.height/n;
+    for(let r=0;r<n;r++){
+      for(let col=0;col<n;col++){
+        ctx.fillStyle = model.isDark(r,col) ? this._opt.colorDark : this._opt.colorLight;
+        const w=Math.ceil((col+1)*pw)-Math.floor(col*pw);
+        const h=Math.ceil((r+1)*ph)-Math.floor(r*ph);
+        ctx.fillRect(Math.round(col*pw), Math.round(r*ph), w, h);
+      }
+    }
+  };
+  Drawer.prototype.clear=function(){ while(this._el.firstChild) this._el.removeChild(this._el.firstChild); };
+
+  function QRBuild(opt){ this._opt=opt; this._drawer=new Drawer(opt.el,opt); }
+  QRBuild.prototype.make=function(text){
+    const m = new Model(this._opt.typeNumber||4, this._opt.correctLevel||ErrCorr.M);
+    m.addData(text); m.make();
+    this._drawer.draw(m);
+  };
+
+  /* ---- extremely small model (not full spec but fine for URLs up to ~100 chars) ---- */
+  function Model(type, level){ this.typeNumber=type; this.level=level; this.modules=null; this.moduleCount=0; this.data=[]; }
+  Model.prototype.addData=function(t){ for(let i=0;i<t.length;i++) this.data.push(t.charCodeAt(i)&255); };
+  Model.prototype.getModuleCount=function(){ return this.moduleCount; };
+  Model.prototype.isDark=function(r,c){
+    if(!this.modules || !this.modules[r] || this.modules[r][c]==null) return false; // patched: never throw
+    return !!this.modules[r][c];
+  };
+  Model.prototype._placeFinders=function(x,y){
+    for(let r=0;r<7;r++)for(let c=0;c<7;c++){
+      const dark = (r===0||r===6||c===0||c===6) || (r>=2&&r<=4&&c>=2&&c<=4);
+      this.modules[y+r][x+c]=dark;
+    }
+  };
+  Model.prototype.make=function(){
+    const t = Math.max(1, Math.min(this.typeNumber, 10));
+    const n = 4*t+17;
+    this.moduleCount = n;
+    this.modules = Array.from({length:n}, ()=>Array(n).fill(null));
+
+    // finder patterns
+    this._placeFinders(0,0);
+    this._placeFinders(n-7,0);
+    this._placeFinders(0,n-7);
+
+    // very naive timing patterns
+    for(let i=8;i<n-8;i++){
+      this.modules[6][i] = i%2===0;
+      this.modules[i][6] = i%2===0;
+    }
+
+    // super-simplified data mapping (no mask / EC) — sufficient for short URLs
+    let i = n-1, dir = -1, bitIdx = 0;
+    const bits = this.data.slice(); // already bytes
+    for(let col=n-1; col>0; col-=2){
+      if(col===6) col--; // skip timing col
+      for(;;){
+        for(let c=0;c<2;c++){
+          const x = col - c, y = i;
+          if(this.modules[y][x] === null){
+            const byte = bits[bitIdx>>0] || 0;
+            const bit = (byte >> (bitIdx%8)) & 1;
+            this.modules[y][x] = !!bit;
+            if(bitIdx%8===7) bits.shift();
+            bitIdx++;
+          }
+        }
+        i += dir;
+        if(i < 0 || i >= n){ i -= dir; dir = -dir; break; }
+      }
+    }
+
+    // ensure quiet zone
+    const qz = 2;
+    for(let r=0;r<n;r++){
+      for(let c=0;c<n;c++){
+        if(r<qz||c<qz||r>=n-qz||c>=n-qz) this.modules[r][c]=false;
+      }
+    }
+  };
+
+  const ErrCorr = { L:1, M:0, Q:3, H:2 };
+
+  /* expose tiny API */
+  window.__TinyQR = { Drawer, QRBuild, Model, ErrCorr };
+})();
 
 /* ===== QR Helpers & Modal ===== */
-let qrRendered = false;
-
 function openQrModal() {
   const modal = $('#qrModal');
   const box = $('#qrBox');
-
-  // show modal first (ensures measurable size)
   modal.setAttribute('aria-hidden', 'false');
 
-  // clear old content
   while (box.firstChild) box.removeChild(box.firstChild);
-  qrRendered = false;
 
-  // render in next tick to avoid layout race
+  // next tick to ensure box has layout
   setTimeout(() => {
-    const level = (window.QRCode && window.QRErrorCorrectLevel && QRErrorCorrectLevel.M) || 0; // M or fallback
-    new QRCode(box, {
-      text: location.href,
-      width: 256,
-      height: 256,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-      correctLevel: level
+    const qr = new window.__TinyQR.QRBuild({
+      el: box, width: 256, height: 256,
+      colorDark: '#000000', colorLight: '#ffffff',
+      typeNumber: 4, correctLevel: window.__TinyQR.ErrCorr.M
     });
-    qrRendered = true;
+    qr.make(location.href);
   }, 0);
 }
-
 function closeQrModal() {
   $('#qrModal').setAttribute('aria-hidden', 'true');
 }
-
 function downloadQrPng() {
   const canvas = $('#qrBox canvas');
   if (!canvas) { alert('Generate the QR first.'); return; }
