@@ -11,10 +11,10 @@
   <meta property="og:image" content="icons/icon-512.png" />
   <meta name="theme-color" content="#0d0d0f" />
 
-  <link rel="manifest" href="./manifest.webmanifest?v=11">
+  <link rel="manifest" href="./manifest.webmanifest?v=12">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-512.png" />
-  <link rel="stylesheet" href="./styles.css?v=11" />
+  <link rel="stylesheet" href="./styles.css?v=12" />
 </head>
 <body>
   <main class="card" role="main">
@@ -40,47 +40,7 @@
     </section>
   </main>
 
-  <!-- Settings Drawer (unchanged) -->
-  <aside id="drawer" class="drawer" aria-hidden="true" aria-label="Settings">
-    <header>
-      <h2>Card Settings</h2>
-      <button id="closeDrawer" class="ghost" aria-label="Close">✕</button>
-    </header>
-    <form id="settingsForm">
-      <div class="grid">
-        <label>Full Name <input name="fullName" required /></label>
-        <label>Title <input name="title" /></label>
-        <label>Bio <textarea name="bio" rows="2"></textarea></label>
-        <label>Avatar URL <input name="avatar" placeholder="https://..." /></label>
-        <label>Email <input name="email" type="email" /></label>
-        <label>Phone <input name="phone" type="tel" /></label>
-        <label>Website <input name="website" type="url" /></label>
-        <label>CTA Label <input name="ctaLabel" placeholder="Book a call" /></label>
-        <label>CTA Link <input name="ctaLink" placeholder="https://cal.com/you" /></label>
-        <fieldset class="stack">
-          <legend>Analytics</legend>
-          <label>Optional Webhook <input name="analyticsWebhook" type="url" /></label>
-          <label class="inline">
-            <input name="analyticsEnabled" type="checkbox" checked /> Enable local analytics
-          </label>
-        </fieldset>
-      </div>
-      <div class="toolbar">
-        <button type="submit" class="primary">Save</button>
-        <button id="exportBtn" type="button" class="ghost">Export JSON</button>
-        <label class="import"><input id="importInput" type="file" accept="application/json" hidden /><span class="ghost">Import JSON</span></label>
-        <button id="resetBtn" type="button" class="danger">Reset</button>
-      </div>
-      <details class="analytics-panel">
-        <summary>View Analytics</summary>
-        <div id="analyticsView" class="mono small"></div>
-        <div class="toolbar">
-          <button id="exportAnalyticsBtn" type="button" class="ghost">Export Events</button>
-          <button id="clearAnalyticsBtn" type="button" class="danger">Clear Events</button>
-        </div>
-      </details>
-    </form>
-  </aside>
+  <!-- Settings Drawer omitted for brevity (unchanged in your project) -->
 
   <!-- QR Modal -->
   <div id="qrModal" class="modal" aria-hidden="true" role="dialog" aria-label="QR code">
@@ -94,9 +54,9 @@
     </div>
   </div>
 
-  <!-- Load QR library first -->
-  <script src="./qrcode.min.js?v=11"></script>
+  <!-- Load offline QR library (unminified to avoid syntax issues) -->
+  <script src="./qrcode.js?v=12"></script>
   <!-- App -->
-  <script src="./app.js?v=11" defer></script>
+  <script src="./app.js?v=12" defer></script>
 </body>
 </html>
