@@ -11,10 +11,10 @@
   <meta property="og:image" content="icons/icon-512.png" />
   <meta name="theme-color" content="#0d0d0f" />
 
-  <link rel="manifest" href="./manifest.webmanifest?v=10">
+  <link rel="manifest" href="./manifest.webmanifest?v=11">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-512.png" />
-  <link rel="stylesheet" href="./styles.css?v=10" />
+  <link rel="stylesheet" href="./styles.css?v=11" />
 </head>
 <body>
   <main class="card" role="main">
@@ -40,7 +40,7 @@
     </section>
   </main>
 
-  <!-- Settings Drawer -->
+  <!-- Settings Drawer (unchanged) -->
   <aside id="drawer" class="drawer" aria-hidden="true" aria-label="Settings">
     <header>
       <h2>Card Settings</h2>
@@ -94,9 +94,9 @@
     </div>
   </div>
 
-  <!-- Offline QR library -->
-  <script src="./qrcode.min.js?v=10"></script>
+  <!-- Load QR library first -->
+  <script src="./qrcode.min.js?v=11"></script>
   <!-- App -->
-  <script src="./app.js?v=10" defer></script>
+  <script src="./app.js?v=11" defer></script>
 </body>
 </html>
