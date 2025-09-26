@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>My Digital Card</title>
+
+  <!-- Social preview -->
+  <meta property="og:title" content="My Digital Card" />
+  <meta property="og:description" content="Tap to save my contact or share." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icons/icon-512.png" />
+  <meta name="theme-color" content="#0d0d0f" />
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-512.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="card" role="main">
+    <header class="hero">
+      <button id="editBtn" aria-label="Open settings" class="ghost">⚙️</button>
+      <img id="avatar" class="avatar" src="" alt="Profile photo" />
+      <h1 id="fullName">Your Name</h1>
+      <p id="title">Your Role</p>
+      <p id="bio" class="muted">One-liner about what you do.</p>
+    </header>
+
+    <section class="links" aria-label="Contact and links">
+      <a id="emailLink" class="chip" href="mailto:you@example.com">📧 Email</a>
+      <a id="phoneLink" class="chip" href="tel:+10000000000">📞 Call</a>
+      <a id="siteLink" class="chip" href="https://example.com" target="_blank" rel="noopener">🌐 Website</a>
+      <a id="ctaBtn" class="cta" href="#" data-cta>Book a call</a>
+    </section>
+
+    <section class="footer-actions">
+      <button id="shareBtn" class="primary">Share Card</button>
+      <button id="saveVcfBtn" class="ghost">Save Contact (VCF)</button>
+    </section>
+  </main>
+
+  <!-- Settings Drawer -->
+  <aside id="drawer" class="drawer" aria-hidden="true" aria-label="Settings">
+    <header>
+      <h2>Card Settings</h2>
+      <button id="closeDrawer" class="ghost" aria-label="Close">✕</button>
+    </header>
+    <form id="settingsForm">
+      <div class="grid">
+        <label>Full Name
+          <input name="fullName" required />
+        </label>
+        <label>Title
+          <input name="title" />
+        </label>
+        <label>Bio
+          <textarea name="bio" rows="2"></textarea>
+        </label>
+        <label>Avatar URL
+          <input name="avatar" placeholder="https://..." />
+        </label>
+        <label>Email
+          <input name="email" type="email" placeholder="you@example.com" />
+        </label>
+        <label>Phone
+          <input name="phone" type="tel" placeholder="+1 555 555 5555" />
+        </label>
+        <label>Website
+          <input name="website" type="url" placeholder="https://example.com" />
+        </label>
+        <label>CTA Label
+          <input name="ctaLabel" placeholder="Book a call" />
+        </label>
+        <label>CTA Link (URL or mailto:)
+          <input name="ctaLink" placeholder="https://cal.com/you" />
+        </label>
+        <fieldset class="stack">
+          <legend>Analytics</legend>
+          <label>Optional Webhook (events export)
+            <input name="analyticsWebhook" type="url" placeholder="https://your-endpoint.example/collect" />
+          </label>
+          <label class="inline">
+            <input name="analyticsEnabled" type="checkbox" checked /> Enable local analytics
+          </label>
+        </fieldset>
+      </div>
+
+      <div class="toolbar">
+        <button type="submit" class="primary">Save</button>
+        <button id="exportBtn" type="button" class="ghost">Export JSON</button>
+        <label class="import">
+          <input id="importInput" type="file" accept="application/json" hidden />
+          <span class="ghost">Import JSON</span>
+        </label>
+        <button id="resetBtn" type="button" class="danger">Reset</button>
+      </div>
+
+      <details class="analytics-panel">
+        <summary>View Analytics</summary>
+        <div id="analyticsView" class="mono small"></div>
+        <div class="toolbar">
+          <button id="exportAnalyticsBtn" type="button" class="ghost">Export Events</button>
+          <button id="clearAnalyticsBtn" type="button" class="danger">Clear Events</button>
+        </div>
+      </details>
+    </form>
+  </aside>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
