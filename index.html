@@ -37,6 +37,7 @@
     <section class="footer-actions">
       <button id="shareBtn" class="primary">Share Card</button>
       <button id="saveVcfBtn" class="ghost">Save Contact (VCF)</button>
+      <button id="qrBtn" class="ghost">Show QR</button>
     </section>
   </main>
 
@@ -106,6 +107,18 @@
       </details>
     </form>
   </aside>
+
+  <!-- QR Modal (offline generator) -->
+  <div id="qrModal" class="modal" aria-hidden="true" role="dialog" aria-label="QR code">
+    <div class="modal-content">
+      <div id="qrBox" class="qrbox" aria-hidden="true"></div>
+      <p class="muted small">Scan this QR code to open my card</p>
+      <div class="toolbar" style="justify-content:center">
+        <button id="downloadQrBtn" class="ghost">Download PNG</button>
+        <button id="closeQr" class="ghost">Close</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js" defer></script>
 </body>
