@@ -5,17 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>My Digital Card</title>
 
-  <!-- Social preview -->
   <meta property="og:title" content="My Digital Card" />
   <meta property="og:description" content="Tap to save my contact or share." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="icons/icon-512.png" />
   <meta name="theme-color" content="#0d0d0f" />
 
-  <link rel="manifest" href="./manifest.webmanifest?v=3">
+  <link rel="manifest" href="./manifest.webmanifest?v=9">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-512.png" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=9" />
 </head>
 <body>
   <main class="card" role="main">
@@ -49,54 +48,29 @@
     </header>
     <form id="settingsForm">
       <div class="grid">
-        <label>Full Name
-          <input name="fullName" required />
-        </label>
-        <label>Title
-          <input name="title" />
-        </label>
-        <label>Bio
-          <textarea name="bio" rows="2"></textarea>
-        </label>
-        <label>Avatar URL
-          <input name="avatar" placeholder="https://..." />
-        </label>
-        <label>Email
-          <input name="email" type="email" placeholder="you@example.com" />
-        </label>
-        <label>Phone
-          <input name="phone" type="tel" placeholder="+1 555 555 5555" />
-        </label>
-        <label>Website
-          <input name="website" type="url" placeholder="https://example.com" />
-        </label>
-        <label>CTA Label
-          <input name="ctaLabel" placeholder="Book a call" />
-        </label>
-        <label>CTA Link (URL or mailto:)
-          <input name="ctaLink" placeholder="https://cal.com/you" />
-        </label>
+        <label>Full Name <input name="fullName" required /></label>
+        <label>Title <input name="title" /></label>
+        <label>Bio <textarea name="bio" rows="2"></textarea></label>
+        <label>Avatar URL <input name="avatar" placeholder="https://..." /></label>
+        <label>Email <input name="email" type="email" /></label>
+        <label>Phone <input name="phone" type="tel" /></label>
+        <label>Website <input name="website" type="url" /></label>
+        <label>CTA Label <input name="ctaLabel" placeholder="Book a call" /></label>
+        <label>CTA Link <input name="ctaLink" placeholder="https://cal.com/you" /></label>
         <fieldset class="stack">
           <legend>Analytics</legend>
-          <label>Optional Webhook (events export)
-            <input name="analyticsWebhook" type="url" placeholder="https://your-endpoint.example/collect" />
-          </label>
+          <label>Optional Webhook <input name="analyticsWebhook" type="url" /></label>
           <label class="inline">
             <input name="analyticsEnabled" type="checkbox" checked /> Enable local analytics
           </label>
         </fieldset>
       </div>
-
       <div class="toolbar">
         <button type="submit" class="primary">Save</button>
         <button id="exportBtn" type="button" class="ghost">Export JSON</button>
-        <label class="import">
-          <input id="importInput" type="file" accept="application/json" hidden />
-          <span class="ghost">Import JSON</span>
-        </label>
+        <label class="import"><input id="importInput" type="file" accept="application/json" hidden /><span class="ghost">Import JSON</span></label>
         <button id="resetBtn" type="button" class="danger">Reset</button>
       </div>
-
       <details class="analytics-panel">
         <summary>View Analytics</summary>
         <div id="analyticsView" class="mono small"></div>
@@ -108,10 +82,10 @@
     </form>
   </aside>
 
-  <!-- QR Modal (offline generator) -->
-  <div id="qrModal" class="modal" aria-hidden="true" role="dialog" aria-label="QR code">
+  <!-- QR Modal -->
+  <div id="qrModal" class="modal" aria-hidden="true">
     <div class="modal-content">
-      <div id="qrBox" class="qrbox" aria-hidden="true"></div>
+      <div id="qrBox" class="qrbox"></div>
       <p class="muted small">Scan this QR code to open my card</p>
       <div class="toolbar" style="justify-content:center">
         <button id="downloadQrBtn" class="ghost">Download PNG</button>
@@ -120,8 +94,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=3" defer></script>
+  <script src="./app.js?v=9" defer></script>
 </body>
 </html>
-
-
