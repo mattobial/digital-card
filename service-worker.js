@@ -1,5 +1,5 @@
 /* Subpath-safe SW for GitHub Pages */
-const VERSION = 'v1.0.4';
+const VERSION = 'v1.0.5';
 const BASE = new URL(self.registration.scope).pathname.replace(/\/+$/, '/') || '/';
 const CACHE_NAME = `card-cache-${VERSION}`;
 
@@ -8,6 +8,7 @@ const ASSETS = [
   `${BASE}index.html`,
   `${BASE}styles.css`,
   `${BASE}app.js`,
+  `${BASE}qrcode.min.js`,
   `${BASE}manifest.webmanifest`,
   `${BASE}icons/icon-512.png`,
   `${BASE}icons/favicon.svg`
