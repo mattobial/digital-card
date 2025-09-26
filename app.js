@@ -46,7 +46,8 @@ function render(d) {
 }
 function fillForm(d) {
   const f = $('#settingsForm');
-  Object.entries(d).forEach(([k, v]) => {
+  if (!f) return;
+  Object.entries(d).forEach(([k,v])=>{
     if (!f.elements[k]) return;
     if (f.elements[k].type === 'checkbox') f.elements[k].checked = !!v;
     else f.elements[k].value = v ?? '';
@@ -70,7 +71,7 @@ function downloadVCF(d) {
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* Analytics */
+/* Analytics (simple) */
 function track(type, data = {}) {
   const st = load(); if (!st.analyticsEnabled) return;
   const evt = { type, data, ts: new Date().toISOString() };
@@ -87,8 +88,8 @@ function track(type, data = {}) {
 }
 function refreshAnalyticsView() {
   const list = JSON.parse(localStorage.getItem(ANALYTICS_KEY) || '[]');
-  const totals = list.reduce((acc, e) => (acc[e.type] = (acc[e.type] || 0) + 1, acc), {});
-  setText('#analyticsView', `Events: ${list.length}\nBreakdown: ${JSON.stringify(totals, null, 2)}`);
+  const totals = list.reduce((acc,e)=>(acc[e.type]=(acc[e.type]||0)+1,acc),{});
+  const el = $('#analyticsView'); if (el) el.textContent = `Events: ${list.length}\nBreakdown: ${JSON.stringify(totals, null, 2)}`;
 }
 function openDrawer(open) { $('#drawer').setAttribute('aria-hidden', open ? 'false' : 'true'); if (open) refreshAnalyticsView(); }
 
@@ -98,10 +99,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 
-  $('#editBtn').addEventListener('click', () => openDrawer(true));
-  $('#closeDrawer').addEventListener('click', () => openDrawer(false));
+  $('#editBtn')?.addEventListener('click', () => openDrawer(true));
+  $('#closeDrawer')?.addEventListener('click', () => openDrawer(false));
 
-  $('#settingsForm').addEventListener('submit', (e) => {
+  $('#settingsForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const f = e.currentTarget;
     const u = {
@@ -121,42 +122,42 @@ window.addEventListener('DOMContentLoaded', () => {
     save(u); render(u); openDrawer(false); track('save_settings');
   });
 
-  $('#exportBtn').addEventListener('click', () => {
+  $('#exportBtn')?.addEventListener('click', () => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(load(), null, 2)], { type: 'application/json' }));
     a.download = 'card-settings.json'; document.body.appendChild(a); a.click(); a.remove();
     track('export_settings');
   });
 
-  $('.import').addEventListener('click', () => $('#importInput').click());
-  $('#importInput').addEventListener('change', async (e) => {
+  $('.import')?.addEventListener('click', () => $('#importInput').click());
+  $('#importInput')?.addEventListener('change', async (e) => {
     const file = e.target.files[0]; if (!file) return;
     try { const json = JSON.parse(await file.text()); save({ ...defaultData, ...json }); render(load()); fillForm(load()); alert('Imported ✅'); track('import_settings'); }
     catch { alert('Invalid JSON ❌'); }
     e.target.value = '';
   });
 
-  $('#resetBtn').addEventListener('click', () => { if (!confirm('Reset to defaults?')) return; localStorage.removeItem(KEY); render(load()); fillForm(load()); track('reset'); });
+  $('#resetBtn')?.addEventListener('click', () => { if (!confirm('Reset to defaults?')) return; localStorage.removeItem(KEY); render(load()); fillForm(load()); track('reset'); });
 
-  $('#shareBtn').addEventListener('click', async () => {
+  $('#shareBtn')?.addEventListener('click', async () => {
     const d = load();
     const payload = { title: d.fullName || 'My Card', text: `${d.fullName} — ${d.title}\n${d.website || ''}`, url: location.href };
     try { if (navigator.share) await navigator.share(payload); else { await navigator.clipboard.writeText(payload.url); alert('Link copied'); } track('share'); } catch {}
   });
-  $('#saveVcfBtn').addEventListener('click', () => { downloadVCF(load()); track('download_vcf'); });
+  $('#saveVcfBtn')?.addEventListener('click', () => { downloadVCF(load()); track('download_vcf'); });
 
-  $('#ctaBtn').addEventListener('click', () => track('cta_click'));
-  $('#emailLink').addEventListener('click', () => track('link_email'));
-  $('#phoneLink').addEventListener('click', () => track('link_phone'));
-  $('#siteLink').addEventListener('click', () => track('link_website'));
+  $('#ctaBtn')?.addEventListener('click', () => track('cta_click'));
+  $('#emailLink')?.addEventListener('click', () => track('link_email'));
+  $('#phoneLink')?.addEventListener('click', () => track('link_phone'));
+  $('#siteLink')?.addEventListener('click', () => track('link_website'));
 
   // QR
-  $('#qrBtn').addEventListener('click', () => { openQrModal(); track('show_qr'); });
-  $('#closeQr').addEventListener('click', closeQrModal);
-  $('#downloadQrBtn').addEventListener('click', downloadQrPng);
+  $('#qrBtn')?.addEventListener('click', () => { openQrModal(); track('show_qr'); });
+  $('#closeQr')?.addEventListener('click', closeQrModal);
+  $('#downloadQrBtn')?.addEventListener('click', downloadQrPng);
 });
 
-/* Proper QR via qrcode.min.js (guarded) */
+/* Proper QR via qrcode.js (guarded) */
 let qrInstance = null;
 function openQrModal() {
   const modal = $('#qrModal'), box = $('#qrBox');
@@ -169,7 +170,7 @@ function openQrModal() {
       msg.className = 'muted small';
       msg.textContent = 'QR library failed to load.';
       box.appendChild(msg);
-      console.error('QRCode library is missing (qrcode.min.js)');
+      console.error('QRCode library is missing (qrcode.js)');
       return;
     }
     qrInstance = new QRCode(box, {
