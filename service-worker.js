@@ -1,10 +1,16 @@
-/* Minimal offline service worker */
-const VERSION = 'v1.0.1';
+/* Subpath-safe offline service worker for GitHub Pages */
+const VERSION = 'v1.0.3';            // bump to invalidate old caches
+const BASE = new URL(self.registration.scope).pathname.replace(/\/+$/, '/') || '/';
 const CACHE_NAME = `card-cache-${VERSION}`;
+
 const ASSETS = [
-  '/', '/index.html', '/styles.css', '/app.js',
-  '/manifest.webmanifest',
-  '/icons/icon-512.png', '/icons/favicon.svg'
+  `${BASE}`,                         // e.g. /digital-card/
+  `${BASE}index.html`,
+  `${BASE}styles.css`,
+  `${BASE}app.js`,
+  `${BASE}manifest.webmanifest`,
+  `${BASE}icons/icon-512.png`,
+  `${BASE}icons/favicon.svg`
 ];
 
 self.addEventListener('install', (event) => {
@@ -22,18 +28,21 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
-  event.respondWith(
-    caches.match(request).then(cached => {
-      const fetchPromise = fetch(request).then(resp => {
-        const clone = resp.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          if (new URL(request.url).origin === self.location.origin) {
-            cache.put(request, clone);
-          }
-        });
-        return resp;
-      }).catch(() => cached);
-      return cached || fetchPromise;
-    })
-  );
+
+  // If request is same-origin and path matches our BASE, use cache-first
+  const url = new URL(request.url);
+  const sameOrigin = url.origin === location.origin;
+
+  if (sameOrigin && url.pathname.startsWith(BASE)) {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        const fetchPromise = fetch(request).then(resp => {
+          const clone = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          return resp;
+        }).catch(() => cached);
+        return cached || fetchPromise;
+      })
+    );
+  }
 });
