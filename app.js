@@ -1,4 +1,4 @@
-/* Ensure the latest SW/assets load */
+/* Ensure fresh SW/assets */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistration().then(reg => {
     if (reg) {
@@ -9,127 +9,82 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* ===== App state ===== */
-const KEY = 'card:data:v1';
-const ANALYTICS_KEY = 'card:analytics:v1';
-const $ = s => document.querySelector(s);
+/* ===== State & helpers ===== */
+const KEY='card:data:v1', ANALYTICS_KEY='card:analytics:v1';
+const $=s=>document.querySelector(s);
+const defaults={fullName:'Your Name',title:'Your Role',bio:'One-liner about what you do.',avatar:'',email:'you@example.com',phone:'+10000000000',website:'https://example.com',ctaLabel:'Book a call',ctaLink:'#',analyticsEnabled:true,analyticsWebhook:''};
+const load=()=>{try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return {...defaults}}};
+const save=d=>localStorage.setItem(KEY,JSON.stringify(d));
+const setText=(sel,t)=>{const el=$(sel); if(el) el.textContent=t||''};
+const setAttr=(sel,a,v)=>{const el=$(sel); if(el) el.setAttribute(a,v)};
 
-const defaults = {
-  fullName: 'Your Name',
-  title: 'Your Role',
-  bio: 'One-liner about what you do.',
-  avatar: '',
-  email: 'you@example.com',
-  phone: '+10000000000',
-  website: 'https://example.com',
-  ctaLabel: 'Book a call',
-  ctaLink: '#',
-  analyticsEnabled: true,
-  analyticsWebhook: ''
-};
-
-const load = () => {
-  try { return { ...defaults, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; }
-  catch { return { ...defaults }; }
-};
-const save = d => localStorage.setItem(KEY, JSON.stringify(d));
-const setText = (sel, t) => { const el = $(sel); if (el) el.textContent = t || ''; };
-const setAttr = (sel, a, v) => { const el = $(sel); if (el) el.setAttribute(a, v); };
-
-/* Render */
+/* Render & form */
 function render(d){
   setAttr('#avatar','src',d.avatar||'');
-  setText('#fullName',d.fullName);
-  setText('#title',d.title);
-  setText('#bio',d.bio);
+  setText('#fullName',d.fullName); setText('#title',d.title); setText('#bio',d.bio);
   setAttr('#emailLink','href',d.email?`mailto:${d.email}`:'#');
   setAttr('#phoneLink','href',d.phone?`tel:${d.phone}`:'#');
   setAttr('#siteLink','href',d.website||'#');
   const c=$('[data-cta]'); if(c){ c.textContent=d.ctaLabel||'Learn more'; c.href=d.ctaLink||'#'; }
 }
 function fillForm(d){
-  const f=$('#settingsForm');
-  if (!f) return;                 // GUARD: form may not exist
-  Object.entries(d).forEach(([k,v])=>{
-    const el = f.elements[k];
-    if (!el) return;
-    if (el.type==='checkbox') el.checked=!!v; else el.value=v??'';
-  });
+  const f=$('#settingsForm'); if(!f) return;
+  Object.entries(d).forEach(([k,v])=>{const el=f.elements[k]; if(!el) return; el.type==='checkbox'?el.checked=!!v:el.value=v??'';});
 }
 
 /* vCard */
 function downloadVCF(d){
-  const txt=['BEGIN:VCARD','VERSION:3.0',`FN:${d.fullName}`,d.title?`TITLE:${d.title}`:'',d.email?`EMAIL:${d.email}`:'',d.phone?`TEL:${d.phone}`:'',d.website?`URL:${d.website}`:'','END:VCARD'].filter(Boolean).join('\r\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/vcard'})); a.download=(d.fullName||'contact').replace(/\s+/g,'_')+'.vcf'; document.body.appendChild(a); a.click(); a.remove();
+  const v=['BEGIN:VCARD','VERSION:3.0',`FN:${d.fullName}`,d.title?`TITLE:${d.title}`:'',d.email?`EMAIL:${d.email}`:'',d.phone?`TEL:${d.phone}`:'',d.website?`URL:${d.website}`:'','END:VCARD`'].filter(Boolean).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([v],{type:'text/vcard'})); a.download=(d.fullName||'contact').replace(/\s+/g,'_')+'.vcf'; document.body.appendChild(a); a.click(); a.remove();
 }
 
 /* Analytics (minimal) */
-function track(type, data={}){
-  const st=load(); if(!st.analyticsEnabled) return;
-  const evt={type,data,ts:new Date().toISOString()};
-  const L=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]'); L.push(evt);
-  localStorage.setItem(ANALYTICS_KEY,JSON.stringify(L));
-  if(st.analyticsWebhook){
-    try{ const b=new Blob([JSON.stringify(evt)],{type:'application/json'}); navigator.sendBeacon?.(st.analyticsWebhook,b) }catch{ fetch(st.analyticsWebhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(evt)}) }
-  }
-}
+function track(type,data={}){const st=load(); if(!st.analyticsEnabled) return; const evt={type,data,ts:new Date().toISOString()}; const L=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]'); L.push(evt); localStorage.setItem(ANALYTICS_KEY,JSON.stringify(L));}
 
-/* Drawer helpers (optional drawer) */
-function openDrawer(open){ const d=$('#drawer'); if(!d) return; d.setAttribute('aria-hidden',open?'false':'true'); }
+/* Drawer (exists in this build) */
+function openDrawer(open){ $('#drawer').setAttribute('aria-hidden',open?'false':'true'); }
 
 /* Init */
-window.addEventListener('DOMContentLoaded', ()=>{
-  const st=load(); render(st); fillForm(st); track('view');
+window.addEventListener('DOMContentLoaded',()=>{
+  const st=load(); render(st); fillForm(st);
 
   if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 
-  $('#editBtn')?.addEventListener('click',()=>openDrawer(true));
-  $('#closeDrawer')?.addEventListener('click',()=>openDrawer(false));
+  $('#editBtn').addEventListener('click',()=>openDrawer(true));
+  $('#closeDrawer').addEventListener('click',()=>openDrawer(false));
 
-  $('#settingsForm')?.addEventListener('submit',e=>{
-    e.preventDefault();
-    const f=e.currentTarget;
+  $('#settingsForm').addEventListener('submit',e=>{
+    e.preventDefault(); const f=e.currentTarget;
     const u={...load(),
-      fullName:f.fullName.value.trim(),
-      title:f.title.value.trim(),
-      bio:f.bio.value.trim(),
-      avatar:f.avatar.value.trim(),
-      email:f.email.value.trim(),
-      phone:f.phone.value.trim(),
-      website:f.website.value.trim(),
-      ctaLabel:f.ctaLabel.value.trim(),
-      ctaLink:f.ctaLink.value.trim(),
-      analyticsEnabled:f.analyticsEnabled.checked,
-      analyticsWebhook:f.analyticsWebhook.value.trim()
+      fullName:f.fullName.value.trim(), title:f.title.value.trim(), bio:f.bio.value.trim(),
+      avatar:f.avatar.value.trim(), email:f.email.value.trim(), phone:f.phone.value.trim(),
+      website:f.website.value.trim(), ctaLabel:f.ctaLabel.value.trim(), ctaLink:f.ctaLink.value.trim(),
+      analyticsEnabled:f.analyticsEnabled.checked, analyticsWebhook:f.analyticsWebhook.value.trim()
     };
     save(u); render(u); openDrawer(false); track('save_settings');
   });
 
-  $('#shareBtn')?.addEventListener('click', async ()=>{
-    const d=load(); const payload={title:d.fullName||'My Card',text:`${d.fullName} — ${d.title}\n${d.website||''}`,url:location.href};
-    try{ if(navigator.share) await navigator.share(payload); else { await navigator.clipboard.writeText(payload.url); alert('Link copied'); } track('share'); }catch{}
-  });
-  $('#saveVcfBtn')?.addEventListener('click',()=>{ downloadVCF(load()); track('download_vcf'); });
+  $('#exportBtn').addEventListener('click',()=>{const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(load(),null,2)],{type:'application/json'})); a.download='card-settings.json'; document.body.appendChild(a); a.click(); a.remove();});
 
-  $('#ctaBtn')?.addEventListener('click',()=>track('cta_click'));
-  $('#emailLink')?.addEventListener('click',()=>track('link_email'));
-  $('#phoneLink')?.addEventListener('click',()=>track('link_phone'));
-  $('#siteLink')?.addEventListener('click',()=>track('link_website'));
+  $('.import').addEventListener('click',()=>$('#importInput').click());
+  $('#importInput').addEventListener('change',async e=>{const file=e.target.files[0]; if(!file) return; try{const json=JSON.parse(await file.text()); save({...defaults,...json}); render(load()); fillForm(load()); alert('Imported ✅');}catch{alert('Invalid JSON ❌');} e.target.value=''; });
 
-  $('#qrBtn')?.addEventListener('click',()=>{ openQrModal(); track('show_qr'); });
-  $('#closeQr')?.addEventListener('click',closeQrModal);
-  $('#downloadQrBtn')?.addEventListener('click',downloadQrPng);
+  $('#resetBtn').addEventListener('click',()=>{ if(!confirm('Reset to defaults?')) return; localStorage.removeItem(KEY); render(load()); fillForm(load()); });
+
+  $('#shareBtn').addEventListener('click',async()=>{const d=load(); const payload={title:d.fullName||'My Card',text:`${d.fullName} — ${d.title}\n${d.website||''}`,url:location.href}; try{ if(navigator.share) await navigator.share(payload); else { await navigator.clipboard.writeText(payload.url); alert('Link copied'); } }catch{} });
+  $('#saveVcfBtn').addEventListener('click',()=>downloadVCF(load()));
+
+  $('#qrBtn').addEventListener('click',()=>openQrModal());
+  $('#closeQr').addEventListener('click',closeQrModal);
+  $('#downloadQrBtn').addEventListener('click',downloadQrPng);
 });
 
-/* Proper QR via qrcode.min.js (standard) */
+/* QR (uses inlined library) */
 function openQrModal(){
-  const modal=$('#qrModal'), box=$('#qrBox');
-  modal.setAttribute('aria-hidden','false');
+  const modal=$('#qrModal'), box=$('#qrBox'); modal.setAttribute('aria-hidden','false');
   while (box.firstChild) box.removeChild(box.firstChild);
-  setTimeout(()=>{
-    if (!window.QRCode || !QRCode.CorrectLevel) { const p=document.createElement('p'); p.textContent='QR library failed to load.'; p.className='muted small'; box.appendChild(p); return; }
-    new QRCode(box,{ text: location.href, width:256, height:256, colorDark:'#000', colorLight:'#fff', correctLevel: QRCode.CorrectLevel.M });
-  },0);
+  // QRCode is defined by the inline library above
+  new QRCode(box,{text:location.href,width:256,height:256,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 }
 function closeQrModal(){ $('#qrModal').setAttribute('aria-hidden','true'); }
-function downloadQrPng(){ const c=$('#qrBox canvas'), img=$('#qrBox img'); const src=c?c.toDataURL('image/png'):img?.src; if(!src) return alert('Generate the QR first.'); const a=document.createElement('a'); a.href=src; a.download='my-card-qr.png'; document.body.appendChild(a); a.click(); a.remove(); }
+function downloadQrPng(){ const c=$('#qrBox canvas'), img=$('#qrBox img'); const src=c?c.toDataURL('image/png'):img?.src; if(!src){alert('Generate the QR first.');return;} const a=document.createElement('a'); a.href=src; a.download='my-card-qr.png'; document.body.appendChild(a); a.click(); a.remove(); }
