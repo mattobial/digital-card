@@ -1,4 +1,4 @@
-/* Ensure fresh SW/assets */
+/* Make sure SW refreshes on new deploys (optional) */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistration().then(reg => {
     if (reg) {
@@ -34,12 +34,9 @@ function fillForm(d){
 
 /* vCard */
 function downloadVCF(d){
-  const v=['BEGIN:VCARD','VERSION:3.0',`FN:${d.fullName}`,d.title?`TITLE:${d.title}`:'',d.email?`EMAIL:${d.email}`:'',d.phone?`TEL:${d.phone}`:'',d.website?`URL:${d.website}`:'','END:VCARD`'].filter(Boolean).join('\r\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([v],{type:'text/vcard'})); a.download=(d.fullName||'contact').replace(/\s+/g,'_')+'.vcf'; document.body.appendChild(a); a.click(); a.remove();
+  const lines=['BEGIN:VCARD','VERSION:3.0',`FN:${d.fullName}`,d.title?`TITLE:${d.title}`:'',d.email?`EMAIL:${d.email}`:'',d.phone?`TEL:${d.phone}`:'',d.website?`URL:${d.website}`:'','END:VCARD'].filter(Boolean).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lines],{type:'text/vcard'})); a.download=(d.fullName||'contact').replace(/\s+/g,'_')+'.vcf'; document.body.appendChild(a); a.click(); a.remove();
 }
-
-/* Analytics (minimal) */
-function track(type,data={}){const st=load(); if(!st.analyticsEnabled) return; const evt={type,data,ts:new Date().toISOString()}; const L=JSON.parse(localStorage.getItem(ANALYTICS_KEY)||'[]'); L.push(evt); localStorage.setItem(ANALYTICS_KEY,JSON.stringify(L));}
 
 /* Drawer (exists in this build) */
 function openDrawer(open){ $('#drawer').setAttribute('aria-hidden',open?'false':'true'); }
@@ -61,14 +58,12 @@ window.addEventListener('DOMContentLoaded',()=>{
       website:f.website.value.trim(), ctaLabel:f.ctaLabel.value.trim(), ctaLink:f.ctaLink.value.trim(),
       analyticsEnabled:f.analyticsEnabled.checked, analyticsWebhook:f.analyticsWebhook.value.trim()
     };
-    save(u); render(u); openDrawer(false); track('save_settings');
+    save(u); render(u); openDrawer(false);
   });
 
   $('#exportBtn').addEventListener('click',()=>{const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(load(),null,2)],{type:'application/json'})); a.download='card-settings.json'; document.body.appendChild(a); a.click(); a.remove();});
-
   $('.import').addEventListener('click',()=>$('#importInput').click());
   $('#importInput').addEventListener('change',async e=>{const file=e.target.files[0]; if(!file) return; try{const json=JSON.parse(await file.text()); save({...defaults,...json}); render(load()); fillForm(load()); alert('Imported ✅');}catch{alert('Invalid JSON ❌');} e.target.value=''; });
-
   $('#resetBtn').addEventListener('click',()=>{ if(!confirm('Reset to defaults?')) return; localStorage.removeItem(KEY); render(load()); fillForm(load()); });
 
   $('#shareBtn').addEventListener('click',async()=>{const d=load(); const payload={title:d.fullName||'My Card',text:`${d.fullName} — ${d.title}\n${d.website||''}`,url:location.href}; try{ if(navigator.share) await navigator.share(payload); else { await navigator.clipboard.writeText(payload.url); alert('Link copied'); } }catch{} });
@@ -79,12 +74,20 @@ window.addEventListener('DOMContentLoaded',()=>{
   $('#downloadQrBtn').addEventListener('click',downloadQrPng);
 });
 
-/* QR (uses inlined library) */
+/* QR (uses qrcode.min.js) */
 function openQrModal(){
   const modal=$('#qrModal'), box=$('#qrBox'); modal.setAttribute('aria-hidden','false');
   while (box.firstChild) box.removeChild(box.firstChild);
-  // QRCode is defined by the inline library above
-  new QRCode(box,{text:location.href,width:256,height:256,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+
+  // If QRCode not yet defined (fallback script still loading), wait a tick
+  const ensure = () => {
+    if (window.QRCode && QRCode.CorrectLevel) {
+      new QRCode(box,{text:location.href,width:256,height:256,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    } else {
+      setTimeout(ensure, 50);
+    }
+  };
+  ensure();
 }
 function closeQrModal(){ $('#qrModal').setAttribute('aria-hidden','true'); }
 function downloadQrPng(){ const c=$('#qrBox canvas'), img=$('#qrBox img'); const src=c?c.toDataURL('image/png'):img?.src; if(!src){alert('Generate the QR first.');return;} const a=document.createElement('a'); a.href=src; a.download='my-card-qr.png'; document.body.appendChild(a); a.click(); a.remove(); }
