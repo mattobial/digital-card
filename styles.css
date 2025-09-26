@@ -90,7 +90,7 @@ details.analytics-panel { margin-top: 10px; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .small { font-size: .9rem; white-space: pre-wrap; }
 
-/* QR modal */
+/* ===== QR Modal ===== */
 .modal {
   position: fixed; inset: 0;
   background: rgba(0,0,0,.65);
@@ -108,9 +108,14 @@ details.analytics-panel { margin-top: 10px; }
 }
 .qrbox {
   display: grid; place-items: center;
-  padding: 10px; background: #0b0c10; border-radius: 12px;
-  border: 1px solid #1d2027; margin: 6px auto 0; min-height: 256px;
+  padding: 10px;
+  background: #ffffff;               /* white for scan contrast */
+  border-radius: 12px;
+  border: 1px solid #1d2027;
+  margin: 6px auto 0;
+  min-height: 256px;
 }
+.qrbox canvas { display:block; }
 
 @media (min-width: 640px) {
   form .grid { grid-template-columns: 1fr 1fr; }
