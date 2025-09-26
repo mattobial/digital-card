@@ -4,68 +4,56 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>My Digital Card</title>
-  <meta name="theme-color" content="#0d0d0f" />
-  <link rel="stylesheet" href="./styles.css?v=2" />
+  <link rel="stylesheet" href="./styles.css?v=3" />
 </head>
 <body>
   <main class="card">
     <header class="hero">
-      <button id="editBtn" aria-label="Open settings" class="ghost gear">⚙️</button>
       <img id="avatar" class="avatar" src="" alt="Profile photo" />
       <h1 id="fullName">Your Name</h1>
-      <p id="title">Your Role</p>
-      <p id="bio" class="muted">One-liner about what you do.</p>
+      <p id="company">Company Name</p>
+      <p id="position">Position / Title</p>
+      <div id="tags" class="tags"></div>
     </header>
 
-    <section class="links">
-      <a id="emailLink" class="chip" href="#">📧 Email</a>
-      <a id="phoneLink" class="chip" href="#">📞 Call</a>
-      <a id="siteLink" class="chip" href="#" target="_blank" rel="noopener">🌐 Website</a>
-      <a id="ctaBtn" class="cta" href="#" target="_blank">Book a call</a>
+    <!-- Quick action buttons -->
+    <section class="quick-actions">
+      <a id="quickEmail" class="circle-btn" href="#">✉️</a>
+      <a id="quickCall" class="circle-btn" href="#">📞</a>
+      <button id="quickShare" class="circle-btn">🔗</button>
     </section>
 
-    <section class="footer-actions">
-      <button id="shareBtn" class="primary">Share Card</button>
-      <button id="qrBtn" class="ghost">Show QR</button>
+    <!-- Contact details -->
+    <section class="contact-list">
+      <a id="emailLink" class="contact-item">📧 <span></span></a>
+      <a id="phoneLink" class="contact-item">📞 <span></span></a>
+      <a id="websiteLink" class="contact-item" target="_blank">🌐 <span></span></a>
+      <a id="instagramLink" class="contact-item" target="_blank">📸 <span></span></a>
+      <a id="facebookLink" class="contact-item" target="_blank">📘 <span></span></a>
+      <a id="linkedinLink" class="contact-item" target="_blank">💼 <span></span></a>
     </section>
+
+    <!-- CTA -->
+    <a id="ctaBtn" class="cta" href="#" target="_blank">Get in touch here</a>
+
+    <!-- Save Contact -->
+    <button id="saveVcfBtn" class="primary wide">Save Contact</button>
   </main>
-
-  <!-- Settings Drawer -->
-  <aside id="drawer" class="drawer" aria-hidden="true">
-    <header class="drawer-head">
-      <h2>Settings</h2>
-      <button id="closeDrawer" class="ghost">✕</button>
-    </header>
-    <form id="settingsForm" class="form">
-      <label>Full Name <input name="fullName" /></label>
-      <label>Title <input name="title" /></label>
-      <label>Bio <textarea name="bio" rows="2"></textarea></label>
-      <label>Avatar URL <input name="avatar" /></label>
-      <label>Email <input name="email" /></label>
-      <label>Phone <input name="phone" /></label>
-      <label>Website <input name="website" /></label>
-      <label>CTA Label <input name="ctaLabel" /></label>
-      <label>CTA Link <input name="ctaLink" /></label>
-      <div class="toolbar">
-        <button type="submit" class="primary">Save</button>
-      </div>
-    </form>
-  </aside>
 
   <!-- QR Modal -->
   <div id="qrModal" class="modal" aria-hidden="true">
     <div class="modal-content">
       <div id="qrBox" class="qrbox"></div>
       <p class="muted small">Scan this QR to open my card</p>
-      <div class="toolbar" style="justify-content:center">
+      <div class="toolbar">
         <button id="downloadQrBtn" class="ghost">Download PNG</button>
         <button id="closeQr" class="ghost">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- QR lib (CDN) + App -->
+  <!-- QR library + app -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="./app.js?v=1" defer></script>
+  <script src="./app.js?v=3" defer></script>
 </body>
 </html>
