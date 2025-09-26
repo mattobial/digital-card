@@ -2,58 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>My Digital Card</title>
-  <link rel="stylesheet" href="./styles.css?v=3" />
+  <meta name="theme-color" content="#0b0e13" />
+  <link rel="stylesheet" href="./styles.css?v=4" />
 </head>
 <body>
   <main class="card">
     <header class="hero">
+      <button id="openSettings" class="icon-btn gear" title="Edit card">⚙️</button>
       <img id="avatar" class="avatar" src="" alt="Profile photo" />
       <h1 id="fullName">Your Name</h1>
       <p id="company">Company Name</p>
-      <p id="position">Position / Title</p>
+      <p id="position" class="muted">Position / Title</p>
       <div id="tags" class="tags"></div>
     </header>
 
-    <!-- Quick action buttons -->
+    <!-- Quick actions -->
     <section class="quick-actions">
-      <a id="quickEmail" class="circle-btn" href="#">✉️</a>
-      <a id="quickCall" class="circle-btn" href="#">📞</a>
-      <button id="quickShare" class="circle-btn">🔗</button>
+      <a id="quickEmail" class="circle-btn" href="#" title="Email">✉️</a>
+      <a id="quickCall" class="circle-btn" href="#" title="Call">📞</a>
+      <button id="quickShare" class="circle-btn" title="Share link">🔗</button>
+      <button id="quickQr" class="circle-btn" title="Show QR">🧾</button>
     </section>
 
-    <!-- Contact details -->
+    <!-- Contact list -->
     <section class="contact-list">
       <a id="emailLink" class="contact-item">📧 <span></span></a>
       <a id="phoneLink" class="contact-item">📞 <span></span></a>
-      <a id="websiteLink" class="contact-item" target="_blank">🌐 <span></span></a>
-      <a id="instagramLink" class="contact-item" target="_blank">📸 <span></span></a>
-      <a id="facebookLink" class="contact-item" target="_blank">📘 <span></span></a>
-      <a id="linkedinLink" class="contact-item" target="_blank">💼 <span></span></a>
+      <a id="websiteLink" class="contact-item" target="_blank" rel="noopener">🌐 <span></span></a>
+      <a id="instagramLink" class="contact-item" target="_blank" rel="noopener">📸 <span></span></a>
+      <a id="facebookLink" class="contact-item" target="_blank" rel="noopener">📘 <span></span></a>
+      <a id="linkedinLink" class="contact-item" target="_blank" rel="noopener">💼 <span></span></a>
     </section>
 
-    <!-- CTA -->
-    <a id="ctaBtn" class="cta" href="#" target="_blank">Get in touch here</a>
-
-    <!-- Save Contact -->
+    <!-- CTA + VCF -->
+    <a id="ctaBtn" class="cta" href="#" target="_blank" rel="noopener">Get in touch here</a>
     <button id="saveVcfBtn" class="primary wide">Save Contact</button>
   </main>
 
+  <!-- Settings Drawer -->
+  <aside id="drawer" class="drawer" aria-hidden="true" aria-label="Card settings">
+    <div class="panel">
+      <header class="drawer-head">
+        <h2>Card Settings</h2>
+        <button id="closeSettings" class="icon-btn" title="Close">✕</button>
+      </header>
+      <form id="settingsForm" class="form">
+        <div class="grid">
+          <label>Full Name <input name="fullName" /></label>
+          <label>Company <input name="company" /></label>
+          <label>Position/Title <input name="position" /></label>
+          <label>Avatar URL <input name="avatar" placeholder="https://..." /></label>
+
+          <label>Email <input name="email" type="email" /></label>
+          <label>Phone <input name="phone" type="tel" /></label>
+          <label>Website <input name="website" type="url" placeholder="https://..." /></label>
+
+          <label>Instagram <input name="instagram" placeholder="@handle or username" /></label>
+          <label>Facebook <input name="facebook" placeholder="username or page" /></label>
+          <label>LinkedIn <input name="linkedin" placeholder="username (in/..)" /></label>
+
+          <label>Tags (comma-separated)
+            <input name="tags" placeholder="IT Services, Consulting" />
+          </label>
+
+          <label>CTA Label <input name="ctaLabel" placeholder="Get in touch here" /></label>
+          <label>CTA Link <input name="ctaLink" type="url" placeholder="https://cal.com/you" /></label>
+        </div>
+
+        <div class="toolbar">
+          <button type="submit" class="primary">Save</button>
+          <button type="button" id="exportBtn" class="ghost">Export JSON</button>
+          <label class="ghost file-label">
+            Import JSON
+            <input id="importInput" type="file" accept="application/json" hidden />
+          </label>
+          <button type="button" id="resetBtn" class="danger">Reset</button>
+        </div>
+      </form>
+    </div>
+  </aside>
+
   <!-- QR Modal -->
-  <div id="qrModal" class="modal" aria-hidden="true">
+  <div id="qrModal" class="modal" aria-hidden="true" role="dialog" aria-label="QR code">
     <div class="modal-content">
       <div id="qrBox" class="qrbox"></div>
       <p class="muted small">Scan this QR to open my card</p>
-      <div class="toolbar">
+      <div class="toolbar" style="justify-content:center">
         <button id="downloadQrBtn" class="ghost">Download PNG</button>
         <button id="closeQr" class="ghost">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- QR library + app -->
+  <!-- QR library (CDN; cached by browser) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="./app.js?v=3" defer></script>
+  <script src="./app.js?v=4" defer></script>
 </body>
 </html>
