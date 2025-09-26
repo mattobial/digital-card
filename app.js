@@ -1,15 +1,19 @@
-const KEY = "card:data:v1";
+const KEY = "card:data:v2";
 const $ = s => document.querySelector(s);
 
 const defaults = {
   fullName: "Your Name",
-  title: "Your Role",
-  bio: "One-liner about you.",
-  avatar: "",
-  email: "",
-  phone: "",
-  website: "",
-  ctaLabel: "Book a call",
+  company: "Company Name",
+  position: "Position / Title",
+  avatar: "avatar.jpg",
+  tags: ["Services", "Consulting"],
+  email: "you@example.com",
+  phone: "+1000000000",
+  website: "https://example.com",
+  instagram: "@yourhandle",
+  facebook: "your.fb",
+  linkedin: "your-linkedin",
+  ctaLabel: "Get in touch here",
   ctaLink: "#"
 };
 
@@ -20,82 +24,84 @@ function load() {
 function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
 
 function render(d){
-  $("#avatar").src = d.avatar || "";
+  $("#avatar").src = d.avatar;
   $("#fullName").textContent = d.fullName;
-  $("#title").textContent = d.title;
-  $("#bio").textContent = d.bio;
-  $("#emailLink").href = d.email ? `mailto:${d.email}` : "#";
-  $("#phoneLink").href = d.phone ? `tel:${d.phone}` : "#";
-  $("#siteLink").href = d.website || "#";
-  $("#ctaBtn").textContent = d.ctaLabel;
-  $("#ctaBtn").href = d.ctaLink || "#";
-}
+  $("#company").textContent = d.company;
+  $("#position").textContent = d.position;
 
-function fillForm(d){
-  const f = $("#settingsForm"); if(!f) return;
-  for (let k in d) if(f.elements[k]) f.elements[k].value = d[k];
-}
-
-// Drawer
-function openDrawer(open) { $("#drawer").setAttribute("aria-hidden", open?"false":"true"); }
-
-// QR
-function openQrModal(){
-  const modal=$("#qrModal"), box=$("#qrBox");
-  modal.setAttribute("aria-hidden","false");
-  while(box.firstChild) box.removeChild(box.firstChild);
-  new QRCode(box,{
-    text: location.href,
-    width: 256, height: 256,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.M
+  const tags = $("#tags");
+  tags.innerHTML = "";
+  d.tags.forEach(t=>{
+    const s=document.createElement("span");
+    s.textContent=t; tags.appendChild(s);
   });
+
+  $("#quickEmail").href = `mailto:${d.email}`;
+  $("#quickCall").href = `tel:${d.phone}`;
+
+  $("#emailLink").href = `mailto:${d.email}`;
+  $("#emailLink span").textContent = d.email;
+
+  $("#phoneLink").href = `tel:${d.phone}`;
+  $("#phoneLink span").textContent = d.phone;
+
+  $("#websiteLink").href = d.website;
+  $("#websiteLink span").textContent = d.website;
+
+  $("#instagramLink").href = "https://instagram.com/"+d.instagram.replace("@","");
+  $("#instagramLink span").textContent = d.instagram;
+
+  $("#facebookLink").href = "https://facebook.com/"+d.facebook;
+  $("#facebookLink span").textContent = d.facebook;
+
+  $("#linkedinLink").href = "https://linkedin.com/in/"+d.linkedin;
+  $("#linkedinLink span").textContent = d.linkedin;
+
+  $("#ctaBtn").textContent = d.ctaLabel;
+  $("#ctaBtn").href = d.ctaLink;
 }
-function closeQrModal(){ $("#qrModal").setAttribute("aria-hidden","true"); }
-function downloadQrPng(){
-  const c=$("#qrBox canvas");
-  if(!c){alert("Generate QR first"); return;}
+
+function downloadVCF(d){
+  const vcf = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `FN:${d.fullName}`,
+    `ORG:${d.company}`,
+    `TITLE:${d.position}`,
+    d.phone?`TEL:${d.phone}`:"",
+    d.email?`EMAIL:${d.email}`:"",
+    d.website?`URL:${d.website}`:"",
+    "END:VCARD"
+  ].filter(Boolean).join("\r\n");
+
+  const blob=new Blob([vcf],{type:"text/vcard"});
   const a=document.createElement("a");
-  a.href=c.toDataURL("image/png");
-  a.download="my-card-qr.png";
+  a.href=URL.createObjectURL(blob);
+  a.download="contact.vcf";
   a.click();
 }
 
-// Init
+function openQrModal(){
+  const modal=$("#qrModal"), box=$("#qrBox");
+  modal.setAttribute("aria-hidden","false");
+  box.innerHTML="";
+  new QRCode(box,{text:location.href,width:220,height:220,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
+}
+function closeQrModal(){ $("#qrModal").setAttribute("aria-hidden","true"); }
+function downloadQrPng(){
+  const c=$("#qrBox canvas"); if(!c) return;
+  const a=document.createElement("a");
+  a.href=c.toDataURL("image/png"); a.download="qr.png"; a.click();
+}
+
 window.addEventListener("DOMContentLoaded",()=>{
-  const st=load(); render(st); fillForm(st);
+  const st=load(); render(st);
 
-  $("#editBtn").onclick = ()=>openDrawer(true);
-  $("#closeDrawer").onclick = ()=>openDrawer(false);
-
-  $("#settingsForm").onsubmit = e=>{
-    e.preventDefault();
-    const f=e.target;
-    const u={
-      fullName:f.fullName.value,
-      title:f.title.value,
-      bio:f.bio.value,
-      avatar:f.avatar.value,
-      email:f.email.value,
-      phone:f.phone.value,
-      website:f.website.value,
-      ctaLabel:f.ctaLabel.value,
-      ctaLink:f.ctaLink.value
-    };
-    save(u); render(u); openDrawer(false);
+  $("#saveVcfBtn").onclick=()=>downloadVCF(load());
+  $("#quickShare").onclick=async()=>{
+    try { await navigator.share({title:st.fullName,text:st.company,url:location.href}); }
+    catch{ await navigator.clipboard.writeText(location.href); alert("Link copied ✅"); }
   };
-
-  $("#shareBtn").onclick = async()=>{
-    try {
-      await navigator.share({title:st.fullName,text:st.title,url:location.href});
-    } catch {
-      await navigator.clipboard.writeText(location.href);
-      alert("Link copied ✅");
-    }
-  };
-
-  $("#qrBtn").onclick = openQrModal;
-  $("#closeQr").onclick = closeQrModal;
-  $("#downloadQrBtn").onclick = downloadQrPng;
+  $("#downloadQrBtn").onclick=downloadQrPng;
+  $("#closeQr").onclick=closeQrModal;
 });
