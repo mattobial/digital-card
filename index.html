@@ -1,3 +1,71 @@
-<script src="./qrcode.min.js?v=16"
-        onerror="(function(){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';document.head.appendChild(s);}())">
-</script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Digital Card</title>
+  <meta name="theme-color" content="#0d0d0f" />
+  <link rel="stylesheet" href="./styles.css?v=1" />
+</head>
+<body>
+  <main class="card">
+    <header class="hero">
+      <button id="editBtn" aria-label="Open settings" class="ghost">⚙️</button>
+      <img id="avatar" class="avatar" src="" alt="Profile photo" />
+      <h1 id="fullName">Your Name</h1>
+      <p id="title">Your Role</p>
+      <p id="bio" class="muted">One-liner about what you do.</p>
+    </header>
+
+    <section class="links">
+      <a id="emailLink" class="chip" href="#">📧 Email</a>
+      <a id="phoneLink" class="chip" href="#">📞 Call</a>
+      <a id="siteLink" class="chip" href="#" target="_blank" rel="noopener">🌐 Website</a>
+      <a id="ctaBtn" class="cta" href="#" target="_blank">Book a call</a>
+    </section>
+
+    <section class="footer-actions">
+      <button id="shareBtn" class="primary">Share Card</button>
+      <button id="qrBtn" class="ghost">Show QR</button>
+    </section>
+  </main>
+
+  <!-- Settings Drawer -->
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <header>
+      <h2>Settings</h2>
+      <button id="closeDrawer" class="ghost">✕</button>
+    </header>
+    <form id="settingsForm">
+      <label>Full Name <input name="fullName" /></label>
+      <label>Title <input name="title" /></label>
+      <label>Bio <textarea name="bio"></textarea></label>
+      <label>Avatar URL <input name="avatar" /></label>
+      <label>Email <input name="email" /></label>
+      <label>Phone <input name="phone" /></label>
+      <label>Website <input name="website" /></label>
+      <label>CTA Label <input name="ctaLabel" /></label>
+      <label>CTA Link <input name="ctaLink" /></label>
+      <div class="toolbar">
+        <button type="submit" class="primary">Save</button>
+      </div>
+    </form>
+  </aside>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div id="qrBox" class="qrbox"></div>
+      <p class="muted small">Scan this QR to open my card</p>
+      <div class="toolbar" style="justify-content:center">
+        <button id="downloadQrBtn" class="ghost">Download PNG</button>
+        <button id="closeQr" class="ghost">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR library (CDN, cached offline after first load) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="./app.js?v=1" defer></script>
+</body>
+</html>
