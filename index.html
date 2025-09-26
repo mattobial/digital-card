@@ -5,16 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>My Digital Card</title>
 
-  <meta property="og:title" content="My Digital Card" />
-  <meta property="og:description" content="Tap to save my contact or share." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="icons/icon-512.png" />
   <meta name="theme-color" content="#0d0d0f" />
-
-  <link rel="manifest" href="./manifest.webmanifest?v=12">
+  <link rel="manifest" href="./manifest.webmanifest?v=13">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-512.png" />
-  <link rel="stylesheet" href="./styles.css?v=12" />
+  <link rel="stylesheet" href="./styles.css?v=13" />
 </head>
 <body>
   <main class="card" role="main">
@@ -27,9 +22,9 @@
     </header>
 
     <section class="links" aria-label="Contact and links">
-      <a id="emailLink" class="chip" href="mailto:you@example.com">📧 Email</a>
-      <a id="phoneLink" class="chip" href="tel:+10000000000">📞 Call</a>
-      <a id="siteLink" class="chip" href="https://example.com" target="_blank" rel="noopener">🌐 Website</a>
+      <a id="emailLink" class="chip" href="#">📧 Email</a>
+      <a id="phoneLink" class="chip" href="#">📞 Call</a>
+      <a id="siteLink" class="chip" href="#" target="_blank" rel="noopener">🌐 Website</a>
       <a id="ctaBtn" class="cta" href="#" data-cta>Book a call</a>
     </section>
 
@@ -40,7 +35,7 @@
     </section>
   </main>
 
-  <!-- Settings Drawer omitted for brevity (unchanged in your project) -->
+  <!-- Settings drawer is optional; if you don’t have it, the app won’t crash -->
 
   <!-- QR Modal -->
   <div id="qrModal" class="modal" aria-hidden="true" role="dialog" aria-label="QR code">
@@ -54,9 +49,9 @@
     </div>
   </div>
 
-  <!-- Load offline QR library (unminified to avoid syntax issues) -->
-  <script src="./qrcode.js?v=12"></script>
+  <!-- Load the QR library first (local, offline) -->
+  <script src="./qrcode.min.js?v=13"></script>
   <!-- App -->
-  <script src="./app.js?v=12" defer></script>
+  <script src="./app.js?v=13" defer></script>
 </body>
 </html>
